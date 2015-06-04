@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="./bower_components/react/react.js"></script>
+    <script src="./bower_components/react-bootstrap/react-bootstrap.js"></script>
+    <script src="./bower_components/react/JSXTransformer.js"></script>
+    <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./main.css" />
+</head>
+<body>
+  <center class="container">
+    <div id="try"> </div>
+  </center>
+  <script type="text/jsx">
+    var Input = ReactBootstrap.Input;
+    var Table = ReactBootstrap.Table;
+    var Pager = ReactBootstrap.Pager;
+    var PageItem = ReactBootstrap.PageItem;
+    var dayInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+    var Calendar = React.createClass({
+      getInitialState : function() {
+      var a = new Date();
+      var year = a.getYear();
+      var month = a.getMonth();
+      var date = a.getDate();
+        return {
+          year: year,
+          month : month,
+          date : date
+        };
+      },
+      render: function() {
+          var arr = [];
+          var brr = [];
+          var crr = [<th></th>];
+          var t = [];
+          var year = this.state.year;
+          var month = this.state.month;
+          var a = new Date();
+          a.setMonth(month);
+          var ifIsRun = (year % 4 === 0 && year % 100 !== 0) || year % 400 == 0;
+          a.setDate(1);
+          var _day = a.getDay();
+          for (var i = 1; i < _day; ++ i)
+              arr.push(<th> </th>);
+          var dayOfMonth = dayInMonth[month];
+          if (month === 2) {
+              if (ifIsRun === true)
+                  dayOfMonth = 29;
+          }
+          for (var i = 1; i <= dayOfMonth; ++ i) arr.push(<th>{i}</th>);
+          for (var i = 0; i < arr.length; ++ i) {
+              if (i % 7 === 0 && i > 0) {
+                  brr.push(<tr>{crr}</tr>);
+                  crr = [<th></th>];
+              }
+              crr.push(arr[i]);
+          }
+          if (crr.length > 0)
+            brr.push(<tr>{crr}</tr>);
+          brr = (<tbody>{brr}</tbody>);
+          for (var i = 1; i <= 7; ++ i) t.push(<th>{i}</th>);
+          var x = <th>星期</th>;
+          var y = <tr>{x}{t}</tr>;
+          var z = <thead>{y}</thead>;
+          return <Table responsive>{z}{brr}</Table>;
+      }
+    });
+
+    var Try = React.createClass({
+        render: function() {
+          return <Pager>
+            <PageItem previous href='#'> last month </PageItem>
+            <Input type='text'> </Input>
+            <PageItem next href='#'> next month </PageItem>
+            <Calendar> </Calendar>
+          </Pager>;
+        }
+    });
+
+    React.render(<Try />, document.getElementById('try'));
+
+  </script>
+</body>
+</html>
