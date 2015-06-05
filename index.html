@@ -17,19 +17,58 @@
     var Table = ReactBootstrap.Table;
     var Pager = ReactBootstrap.Pager;
     var PageItem = ReactBootstrap.PageItem;
-    var dayInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    var dayInMonth = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
     var Calendar = React.createClass({
-      getInitialState : function() {
+      getInitialState: function() {
       var a = new Date();
-      var year = a.getYear();
-      var month = a.getMonth();
+      var year = a.getFullYear();
+      var month = a.getMonth() + 1;
       var date = a.getDate();
         return {
           year: year,
-          month : month,
-          date : date
+          month: month,
+          date: date
         };
+      },
+      handleClickBefore: function(event) {
+        var year = this.state.year;
+        var month = this.state.month;
+        var date = this.state.date;
+        if (month == 1) {
+          year --;
+          month = 12;
+        } else
+          month --;
+        event.preventDefault();
+        this.setState({
+          year: year,
+          month: month,
+          date: date
+        });
+      },
+      handleClickAfter: function(event) {
+        var year = this.state.year;
+        var month = this.state.month;
+        var date = this.state.date;
+        if (month == 12) {
+          year ++;
+          month = 1;
+        } else
+          month ++;
+        event.preventDefault();
+        this.setState({
+          year: year,
+          month: month,
+          date: date
+        });
+      },
+      handleClickDay: function(year, month, day) {
+        this.setState({
+          year: year,
+          month: month,
+          date: day
+        });
       },
       render: function() {
           var arr = [];
@@ -38,19 +77,22 @@
           var t = [];
           var year = this.state.year;
           var month = this.state.month;
+          var date = this.state.date;
           var a = new Date();
-          a.setMonth(month);
+          a.setFullYear(this.state.year);
+          a.setMonth(month - 1);
           var ifIsRun = (year % 4 === 0 && year % 100 !== 0) || year % 400 == 0;
           a.setDate(1);
           var _day = a.getDay();
-          for (var i = 1; i < _day; ++ i)
+          for (var i = 0; i < _day; ++ i)
               arr.push(<th> </th>);
           var dayOfMonth = dayInMonth[month];
           if (month === 2) {
               if (ifIsRun === true)
                   dayOfMonth = 29;
           }
-          for (var i = 1; i <= dayOfMonth; ++ i) arr.push(<th>{i}</th>);
+          for (var i = 1; i <= dayOfMonth; ++ i)
+            arr.push(<th><p onClick={this.handleClickDay.bind(this, year, month, i)}>{i}</p></th>);
           for (var i = 0; i < arr.length; ++ i) {
               if (i % 7 === 0 && i > 0) {
                   brr.push(<tr>{crr}</tr>);
@@ -61,26 +103,36 @@
           if (crr.length > 0)
             brr.push(<tr>{crr}</tr>);
           brr = (<tbody>{brr}</tbody>);
-          for (var i = 1; i <= 7; ++ i) t.push(<th>{i}</th>);
+          t.push(<th>{'日'}</th>);
+          for (var i = 1; i <= 6; ++ i) t.push(<th>{i}</th>);
           var x = <th>星期</th>;
           var y = <tr>{x}{t}</tr>;
           var z = <thead>{y}</thead>;
-          return <Table responsive>{z}{brr}</Table>;
+          var newx = <Table responsive>{z}{brr}</Table>;
+          var newy = <Pager>
+                      <div className="container">
+                        <div className="row">
+                          <div className="col-md-3">
+                            <PageItem onClick={this.handleClickBefore}> last month </PageItem>
+                          </div>
+                          <div className="col-md-3">
+                            <Input type='text' value={[year, month, date].join('-')}> </Input>
+                          </div>
+                          <div className="col-md-3">
+                            <PageItem onClick={this.handleClickAfter}> next month </PageItem>
+                          </div>
+                        </div>
+                      </div>
+                    </Pager>;
+          var newz = [];
+          newz.push(newy);
+          newz.push(newx);
+          return <div>{newz}</div>;
       }
     });
 
-    var Try = React.createClass({
-        render: function() {
-          return <Pager>
-            <PageItem previous href='#'> last month </PageItem>
-            <Input type='text'> </Input>
-            <PageItem next href='#'> next month </PageItem>
-            <Calendar> </Calendar>
-          </Pager>;
-        }
-    });
 
-    React.render(<Try />, document.getElementById('try'));
+    React.render(<Calendar />, document.getElementById('try'));
 
   </script>
 </body>
